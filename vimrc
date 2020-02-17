@@ -31,6 +31,11 @@
 	"devicons
 
 so $VIMRUNTIME/vimrc_example.vim
+"set enc=cp932
+"set enc=UTF-8
+scriptencoding UTF-8
+set fencs=ucs-bom,UTF-8,CP932,SJIS,UTF-16
+
 if has("win32")
 	so $VIMRUNTIME/mswin.vim
 	unmap <C-A>
@@ -39,26 +44,39 @@ if has("win32")
 	set grepprg=findstr\ /N
 	set shell=$COMSPEC\ /F:ON
 	set shellcmdflag=/c
-	set backupdir =~/vimfiles/backupdir
-	set undodir   =~/vimfiles/undodir
-	set directory =~/vimfiles/swapdir
+	set backupdir =~\vimfiles\backupdir
+	set undodir   =~\vimfiles\undodir
+	set directory =~\vimfiles\swapdir
     let g:w3m#command ='c:/cygwin/bin/w3m.exe'
 	set packpath+=L:\cygwin64\home\user\.vim
+	nnoremap <Leader>t :<C-u>terminal ++close ++curwin bash
 elseif has("win32unix")
 	packadd vimdoc-ja
 	packadd vimproc.vim
-	packadd vim-devicons
+	"packadd vim-devicons
 	packadd vim-fugitive
 	packadd ack.vim
 	set backupdir =~/.vim/backupdir
 	set undodir   =~/.vim/undodir
 	set directory =~/.vim/swapdir
     let g:w3m#command ='w3m'
+	set mouse=a
+	set ttymouse=xterm2
+	"set grepprg=ufindstr
 else
 	set backupdir =~/.vim/backupdir
 	set undodir   =~/.vim/undodir
 	set directory =~/.vim/swapdir
     let g:w3m#command ='w3m'
+	set mouse=a
+	set ttymouse=xterm2
+	vnoremap <C-C> "+y
+	"imap     <C-V> "+gP
+	imap     <C-V> <ESC>"+gpa
+	vmap     <C-V> "+gp
+    cmap     <C-V> <C-R>+
+	vnoremap <C-V> "+p
+	noremap  <C-Q> <C-V>
 endif
 
 " for terminal
@@ -69,14 +87,13 @@ endif
 set t_Co=256
 
 " common
-colo neon
 set cscopequickfix=s-,c-,d-,i-,t-,e-
-set fencs=ucs-bom,UTF-8,Shift_JIS,UTF-16
 set cursorline
 set cryptmethod=blowfish2
 set nowrap
 set ts=4
 set sw=4
+set expandtab
 set smartindent
 set hlsearch
 set incsearch
@@ -91,64 +108,94 @@ set showcmd
 set undofile
 set hidden
 set cursorline
-set background=dark
 let c_space_errors=1
 let mapleader = ","
 set fillchars+=stl::
 set wildmode=longest:full,full
 set ambiwidth=double
-set fileencodings=utf-8,euc-jp,sjis,iso-2022-jp
 set visualbell
+set title
+set exrc
+set nofixeol
 let g:explVertical=1	" Split vertically
 let g:explSplitRight=1	" Put new window to the right of the explorer
 let g:explStartRight=0	" Put new explorer window to the left of the current window
 
 map <C-PageUp>	  [cz.
 map <C-PageDown>  ]cz.
-map <C-Tab>		gt
-map <S-C-Tab>	gT
+nnoremap <C-Tab>   gt
+nnoremap <S-C-Tab> gT
+inoremap <silent> jj <ESC>
 
 nnoremap <Leader>s :<C-u>cs f s <C-R><C-W><CR>
-nnoremap <Leader>a :<C-u>cs add .<CR>
+"nnoremap <Leader>a :<C-u>cs add .<CR>
 nnoremap <Leader>h :<C-u>QuickhlManualAdd! \<<C-R><C-W>\>
 nnoremap <silent> <Leader>H :<C-u>QuickhlManualReset<CR>
-:nnoremap <C-n> :<C-u>cn<CR>
-:nnoremap <C-p> :<C-u>cp<CR>
+nnoremap <C-n> :<C-u>cn<CR>
+nnoremap <C-p> :<C-u>cp<CR>
 
 " matchit スクリプトを読み込む
 so $VIMRUNTIME/macros/matchit.vim
 let loaded_matchit = 1
 
-" filetype
-au BufRead,BufNewFile,BufReadPre *.coffee    setf coffee
-au BufRead,BufNewFile,BufReadPre *.slim      setf slim
-au BufRead,BufNewFile,BufReadPre *.spacemacs setf lisp
-au filetype html       setlocal ts=2 sts=2 sw=2 et
-au filetype haml       setlocal ts=2 sw=2 sts=2 et
-au filetype coffee     setlocal ts=2 sw=2 sts=2 et
-au filetype ruby       setlocal ts=2 sw=2 sts=2 et
-au filetype slim       setlocal ts=4 sw=2 sts=2 et
-au filetype javascript setlocal ts=2 sw=2 sts=2 et
-au filetype xml        setlocal ts=4 sw=4 sts=4 et
+" cscope
+if has("cscope")
+	set csto=0
+	set cst
+	set nocsverb
+	" add any database in current directory
+	if filereadable("cscope.out")
+		cs add cscope.out
+	" else add database pointed to by environment
+	elseif $CSCOPE_DB != ""
+		cs add $CSCOPE_DB
+	endif
+	set csverb
+endif
 
 " added -d option
-set diffexpr=MyDiff()
-function! MyDiff()
-   let opt = ""
-   if &diffopt =~ "icase"
-	 let opt = opt . "-i "
-   endif
-   if &diffopt =~ "iwhite"
-	 let opt = opt . "-b "
-   endif
-   silent execute "!diff -d -a --binary " . opt . v:fname_in . " " . v:fname_new .
-	\  " > " . v:fname_out
-endfunction
+
+" https://qiita.com/takaakikasai/items/3d4f8a4867364a46dfa3
+" diffのコマンド
+"set diffexpr=MyDiff()
+"function MyDiff()
+"  let opt = ""
+"  if &diffopt =~ "iwhite"
+"    let opt = opt . "-b "
+"  endif
+"  silent execute "!git-diff-normal-format " . opt . v:fname_in . " " . v:fname_new . " > " . v:fname_out
+"  redraw!
+"endfunction
+set diffopt=internal,filler,algorithm:histogram,indent-heuristic
+"set diffopt=internal,filler,algorithm:patience,indent-heuristic
+"set diffopt=internal,filler,algorithm:minimal,indent-heuristic
 
 " ruby
 " http://stackoverflow.com/questions/16902317/vim-slow-with-ruby-syntax-highlighting
 " この設定にすると遅いのがましになった
 set re=1
+
+" aspx整形
+
+function! FormatAspx() range
+" %s/>\(<[^\/]\)/>\r\1/g
+  let lnum = a:firstline
+  while lnum <= a:lastline
+    let line = getline(lnum)
+    let repl = substitute(line, '>\(<[^\/]\)', '>\n\1', 'g')
+    call setline(lnum, repl)
+    let lnum = lnum + 1
+  endwhile
+endf
+
+" ファイル位置を含めてコピーする
+function! CopyLocation() range
+	call setreg("@", ["// " . @% . ":" . a:firstline] + getline(a:firstline, a:lastline))
+endf
+
+map <F9> gF
+map <F10> :call CopyLocation()<CR>
+map <F11> :call FormatAspx()<CR>
 
 " TagList
 nnoremap <silent> <F8> :TlistToggle<CR>
@@ -183,14 +230,14 @@ nnoremap <silent> <F8> :TlistToggle<CR>
 			  \ }
 			  \ }
 	endif
-"endif
 
 " csapprox
-	let g:CSApprox_hook_post = ['hi Normal  ctermbg=NONE',
-							\ 'hi NonText ctermbg=NONE' ]
+	"let g:CSApprox_konsole = 1
+	"let g:CSApprox_hook_post = ['hi Normal  ctermbg=NONE', 'hi NonText ctermbg=NONE' ]
+	let g:CSApprox_attr_map = { 'italic' : 'underline', 'sp' : 'fg' }
 
 " VimFiler
-let g:vimfiler_as_default_explorer = 1
+	let g:vimfiler_as_default_explorer = 1
 
 " unite
 	let g:unite_enable_start_insert = 1
@@ -202,11 +249,20 @@ let g:vimfiler_as_default_explorer = 1
 	nnoremap <silent> <Leader>k :<C-u>Unite -buffer-name=files bookmark<CR>
 	nnoremap <silent> <Leader>o :<C-u>Unite outline<CR>
 	nnoremap <silent> <Leader>r :<C-u>Unite neomru/file<CR>
-	nnoremap <silent> <Leader>s :<C-u>Unite source<CR>
+	nnoremap <silent> <Leader>p :<C-u>Unite file_rec/git<CR>
+	"nnoremap <silent> <Leader>v <Plug>AddComment 
+	nnoremap <silent> <Leader>V :<C-u>CheckReview
+	autocmd FileType unite call s:unite_my_settings()
+	function! s:unite_my_settings()
+    call unite#custom_default_action('source/bookmark/directory' , 'vimfiler')
+	endfunction
+
+" mru
+	let g:neomru#follow_links=1
 
 " codereview
 	let g:CodeReviewer_reviewer="TK"
-	let g:CodeReviewer_reviewFile=$HOME . "/review.rev"
+	let g:CodeReviewer_reviewFile=$HOME . "/.cache/review.rev"
 
 " SilverSearcher ag
 	" カーソル位置の単語をgrep検索
@@ -215,11 +271,20 @@ let g:vimfiler_as_default_explorer = 1
 	nnoremap <silent> <Leader>g  :<C-u>UniteResume search-buffer<CR>
 
 	" unite grep に ag(The Silver Searcher) を使う
-	if executable('ag')
-	  let g:unite_source_grep_command = 'ag'
-	  let g:unite_source_grep_default_opts = '--nogroup --nocolor --column'
+	" pt に変更
+	" https://github.com/monochromegane/the_platinum_searcher
+	if executable('pt')
+	  let g:unite_source_grep_command = 'pt'
+	  let g:unite_source_grep_default_opts = '--nogroup --nocolor'
+	  let g:unite_source_grep_encoding = 'utf-8'
 	  let g:unite_source_grep_recursive_opt = ''
 	endif
+	"if executable('hwt')
+	"  let g:unite_source_grep_command = 'hwt'
+	"  let g:unite_source_grep_default_opts = '--nogroup --nocolor'
+	"  let g:unite_source_grep_encoding = 'utf-8'
+	"  let g:unite_source_grep_recursive_opt = ''
+	"endif
 
 " EasyAlign
 vmap <Enter> <Plug>(EasyAlign)
@@ -227,7 +292,7 @@ vmap <Enter> <Plug>(EasyAlign)
 " Tagbar
 	let g:tagbar_left = 1
 	let g:tagbar_autoclose = 1
-	nnoremap <silent> <F9> :TagbarToggle<CR>
+	nnoremap <silent> <F7> :TagbarToggle<CR>
 	let g:tagbar_type_javascript = {
 		\ 'ctagstype' : 'js',
 		\ 'ctagsbin' : 'ctags',
@@ -335,93 +400,145 @@ let g:jsx_ext_required = 0 " Allow JSX in normal JS files
 let g:rainbow_active = 1
 
 " lightline
-	set laststatus=2
-    if !has("win32")
-	  let g:lightline = {
-	        \ 'colorscheme': 'darcula',
-	        \ 'active': {
-	        \   'left': [ [ 'mode', 'paste' ], [ 'filename' ]],
-	        \   'right': [ [ 'lineinfo' ], ['percent'], [ 'fileencoding' ] ]
-	        \ },
-	        \ 'component_function': {
-	        \   'readonly': 'LightlineReadonly',
-	        \   'filename': 'LightlineFilename',
-	        \   'fileencoding': 'LightlineFileencoding',
-	        \   'mode': 'LightlineMode',
-	        \ },
-	        \ 'separator': { 'left': '', 'right': '' },
-	        \ 'subseparator': { 'left': '', 'right': '' }
-	        \ }
+  set laststatus=2
+  let g:lightline = {
+		\ 'colorscheme': 'darcula',
+		\ 'active': {
+		\   'left': [ [ 'mode', 'paste' ], [ 'filename' ]],
+		\   'right': [ [ 'lineinfo' ], ['percent'], [ 'fileencoding' ] ]
+		\ },
+		\ 'component_function': {
+		\   'readonly': 'LightlineReadonly',
+        \   'filetype': 'MyFiletype',
+        \   'fileformat': 'MyFileformat',
+		\   'filename': 'LightlineFilename',
+		\   'fileencoding': 'LightlineFileencoding',
+		\   'mode': 'LightlineMode',
+		\ },
+		\ 'separator': { 'left': '', 'right': '' },
+		\ 'subseparator': { 'left': '', 'right': '' }
+		\ }
 
-	  function! LightlineModified()
-	    return &ft =~ 'help' ? '' : &modified ? '+' : &modifiable ? '' : '-'
-	  endfunction
+  function! MyFiletype()
+    return winwidth(0) > 70 ? (strlen(&filetype) ? &filetype . ' ' . WebDevIconsGetFileTypeSymbol() : 'no ft') : ''
+  endfunction
+  
+  function! MyFileformat()
+    return winwidth(0) > 70 ? (&fileformat . ' ' . WebDevIconsGetFileFormatSymbol()) : ''
+  endfunction
 
-	  function! LightlineReadonly()
-	    return &ft !~? 'help' && &readonly ? '' : ''
-	  endfunction
+  function! LightlineModified()
+	return &ft =~ 'help' ? '' : &modified ? '+' : &modifiable ? '' : '-'
+  endfunction
 
-	  function! LightlineFilename()
-	    let fname = expand('%:t')
-	    return fname == '__Tagbar__' ? g:lightline.fname :
-	          \ fname =~ '__Gundo\|NERD_tree' ? '' :
-	          \ &ft == 'vimfiler' ? vimfiler#get_status_string() :
-	          \ &ft == 'unite' ? unite#get_status_string() :
-	          \ &ft == 'vimshell' ? vimshell#get_status_string() :
-	          \ ('' != LightlineReadonly() ? LightlineReadonly() . ' ' : '') .
-	          \ ('' != fname ? fname : '[No Name]') .
-	          \ ('' != LightlineModified() ? ' ' . LightlineModified() : '')
-	  endfunction
+  function! LightlineReadonly()
+	return &ft !~? 'help' && &readonly ? '' : ''
+  endfunction
 
-	  function! LightlineFileencoding()
-	    return winwidth(0) > 70 ? ((&fenc !=# '' ? &fenc : &enc) . WebDevIconsGetFileFormatSymbol()) : ''
-	  endfunction
+  function! LightlineFilename()
+	let fname = expand('%:t')
+	return fname == '__Tagbar__' ? g:lightline.fname :
+		  \ fname =~ '__Gundo\|NERD_tree' ? '' :
+		  \ &ft == 'vimfiler' ? vimfiler#get_status_string() :
+		  \ &ft == 'unite' ? unite#get_status_string() :
+		  \ &ft == 'vimshell' ? vimshell#get_status_string() :
+		  \ ('' != LightlineReadonly() ? LightlineReadonly() . ' ' : '') .
+		  \ ('' != fname ? fname : '[No Name]') .
+		  \ ('' != LightlineModified() ? ' ' . LightlineModified() : '')
+  endfunction
 
-	  function! LightlineMode()
-	    let fname = expand('%:t')
-	    return fname == '__Tagbar__' ? 'Tagbar' :
-	          \ fname == '__Gundo__' ? 'Gundo' :
-	          \ fname == '__Gundo_Preview__' ? 'Gundo Preview' :
-	          \ fname =~ 'NERD_tree' ? 'NERDTree' :
-	          \ &ft == 'unite' ? 'Unite' :
-	          \ &ft == 'vimfiler' ? 'VimFiler' :
-	          \ &ft == 'vimshell' ? 'VimShell' :
-	          \ winwidth(0) > 60 ? lightline#mode() : ''
-	  endfunction
+  function! LightlineFileencoding()
+	return winwidth(0) > 70 ? ((&fenc !=# '' ? &fenc : &enc) . WebDevIconsGetFileFormatSymbol()) : ''
+  endfunction
 
-	  let g:tagbar_status_func = 'TagbarStatusFunc'
+  function! LightlineMode()
+	let fname = expand('%:t')
+	return fname == '__Tagbar__' ? 'Tagbar' :
+		  \ fname == '__Gundo__' ? 'Gundo' :
+		  \ fname == '__Gundo_Preview__' ? 'Gundo Preview' :
+		  \ fname =~ 'NERD_tree' ? 'NERDTree' :
+		  \ &ft == 'unite' ? 'Unite' :
+		  \ &ft == 'vimfiler' ? 'VimFiler' :
+		  \ &ft == 'vimshell' ? 'VimShell' :
+		  \ winwidth(0) > 60 ? lightline#mode() : ''
+  endfunction
 
-	  function! TagbarStatusFunc(current, sort, fname, ...) abort
-	      let g:lightline.fname = a:fname
-	    return lightline#statusline(0)
-	  endfunction
-	endif
+  let g:tagbar_status_func = 'TagbarStatusFunc'
+
+  function! TagbarStatusFunc(current, sort, fname, ...) abort
+	  let g:lightline.fname = a:fname
+	return lightline#statusline(0)
+  endfunction
 
 	let g:unite_force_overwrite_statusline = 0
 	let g:vimfiler_force_overwrite_statusline = 0
 	let g:vimshell_force_overwrite_statusline = 0
 
-" gitgutter
-	if has("win32unix")
-		let g:gitgutter_sign_added              = '+'
-		let g:gitgutter_sign_modified           = 'o'
-		let g:gitgutter_sign_removed            = 'x'
-		let g:gitgutter_sign_removed_first_line = '^'
-		let g:gitgutter_sign_modified_removed   = 'ox'
-		let g:gitgutter_override_sign_column_highlight = 0
-		highlight SignColumn            guibg=BLACK
-		highlight GitGutterAdd          guibg=BLACK guifg=orange
-		highlight GitGutterChange       guibg=BLACK guifg=orange
-		highlight GitGutterDelete       guibg=BLACK guifg=purple
-		highlight GitGutterChangeDelete guibg=BLACK guifg=orange
-	  packadd vim-gitgutter
-	endif
+"" gitgutter
+"	if has("win32unix")
+"		let g:gitgutter_sign_added              = '+'
+"		let g:gitgutter_sign_modified           = 'o'
+"		let g:gitgutter_sign_removed            = 'x'
+"		let g:gitgutter_sign_removed_first_line = '^'
+"		let g:gitgutter_sign_modified_removed   = 'ox'
+"		let g:gitgutter_override_sign_column_highlight = 0
+"		highlight SignColumn            guibg=BLACK
+"		highlight GitGutterAdd          guibg=BLACK guifg=orange
+"		highlight GitGutterChange       guibg=BLACK guifg=orange
+"		highlight GitGutterDelete       guibg=BLACK guifg=purple
+"		highlight GitGutterChangeDelete guibg=BLACK guifg=orange
+"	  packadd vim-gitgutter
+"	endif
 
 " ack.vim
-	let g:ackprg = "ag --vimgrep"
 	let g:ack_autofold_results = 0
-	nnoremap ,a :Ack!<Space>
+	let g:ack_default_options = '--nogroup --nocolor'
+	let g:ackprg = "pt"
+	nnoremap <leader>a :Ack!<Space>
 
 " gundo
-	nnoremap ,u :GundoToggle<CR>
+	nnoremap <leader>u :GundoToggle<CR>
 
+" editorconfig
+	let g:editorconfig_blacklist = {
+	    \ 'filetype': ['git.*', 'fugitive'],
+	    \ 'pattern': ['\.un~$']}
+
+" neomru
+	if has("unix")
+		" パスにmntが入っていると無視されるのでmntを抜く
+		let g:neomru#file_mru_ignore_pattern='\~$\|\.\%(o\|exe\|dll\|bak\|zwc\|pyc\|sw[po]\)$\|\%(^\|/\)\.\%(hg\|git\|bzr\|svn\)\%($\|/\)\|^\%(\\\\\|/media/\|/temp/\|/tmp/\|\%(/private\)\=/var/folders/\)\|\%(^\%(fugitive\)://\)\|\%(^\%(term\)://\)'
+	endif
+
+" devicons
+    let g:webdevicons_enable_unite = 1
+    let g:webdevicons_enable_vimfiler = 1
+
+set tgc
+set background=dark
+colo gruvbox
+highlight CursorLine cterm=none
+"set background=light
+"colo eclipse
+
+" When using `dd` in the quickfix list, remove the item from the quickfix list.
+function! RemoveQFItem()
+  let curqfidx = line('.') - 1
+  let qfall = getqflist()
+  call remove(qfall, curqfidx)
+  call setqflist(qfall, 'r')
+  execute curqfidx + 1 . "cfirst"
+  :copen
+endfunction
+:command! RemoveQFItem :call RemoveQFItem()
+" Use map <buffer> to only map dd in the quickfix window. Requires +localmap
+autocmd FileType qf map <buffer> dd :RemoveQFItem<cr>
+
+au VimEnter * if filereadable("init.vim") | source init.vim | endif
+
+au FileType cs         setlocal sw=4 ts=4 et
+au FileType html       setlocal sw=2 ts=2 et
+au FileType javascript setlocal sw=2 ts=2 et
+au FileType json       setlocal sw=2 ts=2 et
+au FileType ruby       setlocal sw=2 ts=2 et
+au FileType ts         setlocal sw=2 ts=2 et
