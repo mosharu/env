@@ -70,6 +70,16 @@ else
     let g:w3m#command ='w3m'
 	set mouse=a
 	set ttymouse=xterm2
+    if executable('ag')
+        set grepprg=ag\ --nogroup\ -iS
+        set grepformat=%f:%l:%m
+    elseif executable('ack')
+        set grepprg=ack\ --nogroup
+        set grepformat=%f:%l:%m
+    else
+        set grepprg=grep\ -Hnd\ skip\ -r
+        set grepformat=%f:%l:%m,%f:%l%m,%f\ \ %l%m
+    endif
 	vnoremap <C-C> "+y
 	"imap     <C-V> "+gP
 	imap     <C-V> <ESC>"+gpa
@@ -117,6 +127,7 @@ set visualbell
 set title
 set exrc
 set nofixeol
+set foldlevelstart=99
 let g:explVertical=1	" Split vertically
 let g:explSplitRight=1	" Put new window to the right of the explorer
 let g:explStartRight=0	" Put new explorer window to the left of the current window
@@ -190,7 +201,28 @@ endf
 
 " ファイル位置を含めてコピーする
 function! CopyLocation() range
-	call setreg("@", ["// " . @% . ":" . a:firstline] + getline(a:firstline, a:lastline))
+    let l:ext = expand("%:e")
+    if match(['inc', 'def', 'h'], l:ext) >= 0
+        let l:ext = 'c'
+    elseif 'CMakeLists.txt' == expand('%:t')
+        let l:ext = 'cmake'
+    endif
+
+    let l:lines = [
+	    \ '- ' . @% . ':' . a:firstline,
+	    \ '',
+	    \ '  ```' . l:ext,
+        \]
+    for l:line in getline(a:firstline, a:lastline)
+        if len(l:line) > 0
+            call add(l:lines, '  ' . l:line)
+        else
+            call add(l:lines, '')
+        endif
+    endfor
+    call add(l:lines, '  ```')
+    call add(l:lines, '')
+	call setreg("@", l:lines)
 endf
 
 map <F9> gF
@@ -392,22 +424,23 @@ let g:rainbow_conf = {'guifgs': [ '#1abc9c', '#e67e22', '#2ecc71', '#f1c40f', '#
 " lightline
   set laststatus=2
   let g:lightline = {
-		\ 'colorscheme': 'gruvbox',
-		\ 'active': {
-		\   'left': [ [ 'mode', 'paste' ], [ 'filename' ]],
-		\   'right': [ [ 'lineinfo' ], ['percent'], [ 'fileencoding' ] ]
-		\ },
-		\ 'component_function': {
-		\   'readonly': 'LightlineReadonly',
-        \   'filetype': 'MyFiletype',
-        \   'fileformat': 'MyFileformat',
-		\   'filename': 'LightlineFilename',
-		\   'fileencoding': 'LightlineFileencoding',
-		\   'mode': 'LightlineMode',
-		\ },
-		\ 'separator': { 'left': '', 'right': '' },
-		\ 'subseparator': { 'left': '', 'right': '' }
-		\ }
+    \ 'colorscheme': 'gruvbox',
+    \ 'active': {
+    \   'left': [ [ 'mode', 'paste' ], [ 'filename' ]],
+    \   'right': [ [ 'lineinfo' ], ['percent'], [ 'fileencoding' ] ]
+    \ },
+    \ 'component_function': {
+	\   'fugitive': 'LightlineFugitive',
+    \   'readonly': 'LightlineReadonly',
+    \   'filetype': 'MyFiletype',
+    \   'fileformat': 'MyFileformat',
+    \   'filename': 'LightlineFilename',
+    \   'fileencoding': 'LightlineFileencoding',
+    \   'mode': 'LightlineMode',
+    \ },
+    \ 'separator': { 'left': '', 'right': '' },
+    \ 'subseparator': { 'left': '', 'right': '' }
+    \ }
 
   function! MyFiletype()
     return winwidth(0) > 70 ? (strlen(&filetype) ? &filetype . ' ' . WebDevIconsGetFileTypeSymbol() : 'no ft') : ''
@@ -453,6 +486,14 @@ let g:rainbow_conf = {'guifgs': [ '#1abc9c', '#e67e22', '#2ecc71', '#f1c40f', '#
 		  \ winwidth(0) > 60 ? lightline#mode() : ''
   endfunction
 
+  function! LightlineFugitive()
+  	if exists('*FugitiveHead')
+  		let branch = FugitiveHead()
+  		return branch !=# '' ? ''.branch : ''
+  	endif
+  	return ''
+  endfunction
+
   let g:tagbar_status_func = 'TagbarStatusFunc'
 
   function! TagbarStatusFunc(current, sort, fname, ...) abort
@@ -460,9 +501,9 @@ let g:rainbow_conf = {'guifgs': [ '#1abc9c', '#e67e22', '#2ecc71', '#f1c40f', '#
 	return lightline#statusline(0)
   endfunction
 
-	let g:unite_force_overwrite_statusline = 0
-	let g:vimfiler_force_overwrite_statusline = 0
-	let g:vimshell_force_overwrite_statusline = 0
+  let g:unite_force_overwrite_statusline = 0
+  let g:vimfiler_force_overwrite_statusline = 0
+  let g:vimshell_force_overwrite_statusline = 0
 
 "" gitgutter
 "	if has("win32unix")
@@ -503,6 +544,13 @@ let g:rainbow_conf = {'guifgs': [ '#1abc9c', '#e67e22', '#2ecc71', '#f1c40f', '#
 " devicons
     let g:webdevicons_enable_unite = 1
     let g:webdevicons_enable_vimfiler = 1
+    let g:WebDevIconsUnicodeGlyphDoubleWidth = 1
+
+" markdown
+    " https://github.com/tpope/vim-markdown
+    let g:markdown_fenced_languages = ['c', 'cpp', 'make', 'cmake', 'html', 'python', 'bash=sh']
+    let g:markdown_minlines = 500
+    let g:markdown_folding = 1
 
 set tgc
 set background=dark
