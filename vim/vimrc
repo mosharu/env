@@ -1,40 +1,5 @@
-"NeoBundle
-	"NeoBundle 'Shougo/neomru.vim.git'
-	"NeoBundle 'Shougo/unite-outline.git'
-	"NeoBundle 'Shougo/unite.vim.git'
-	"NeoBundle 'Shougo/vimfiler.git'
-	"NeoBundle 'Shougo/vimproc.git'
-	"NeoBundle 'Shougo/vimshell.git'
-	"NeoBundle 'digitaltoad/vim-jade.git'
-	"NeoBundle 'fuenor/im_control.vim.git'
-	"NeoBundle 'kchmck/vim-coffee-script.git'
-	"NeoBundle 'kshenoy/vim-signature.git'
-	"NeoBundle 'majutsushi/tagbar'
-	"NeoBundle 'slim-template/vim-slim.git'
-	"NeoBundle 'itchyny/lightline.vim.git'
-	"NeoBundle 'thinca/vim-ref.git'
-	"NeoBundle 'tpope/vim-fugitive.git'
-	"NeoBundle 'vim-jp/vimdoc-ja.git'
-	"NeoBundle 'vim-scripts/Align.git'
-	"NeoBundle 'vim-scripts/CodeReviewer.vim.git'
-	"NeoBundle 'vim-scripts/vcscommand.vim.git'
-	"NeoBundle 'luochen1990/rainbow'
-	"NeoBundle 'junegunn/vim-easy-align.git'
-	"NeoBundle 'rking/ag.vim'
-	"NeoBundle 'hail2u/vim-css3-syntax.git'
-	"NeoBundle 'othree/html5.vim'
-	"NeoBundle 'pangloss/vim-javascript'
-	""NeoBundle 'mxw/vim-jsx'
-	"call neobundle#local("~/.vim/bundle",
-	"	\   {}, ['CSApprox', 'ScrollColors', 'coffeetags', 'vim-coffee-script'])
-	"https://github.com/t9md/vim-quickhl.git
-	"devicons
-
-so $VIMRUNTIME/vimrc_example.vim
-"set enc=cp932
-"set enc=UTF-8
 scriptencoding UTF-8
-set fencs=ucs-bom,UTF-8,CP932,SJIS,UTF-16
+set fencs=ucs-bom,UTF-8,CP932,SJIS
 
 if has("win32")
 	so $VIMRUNTIME/mswin.vim
@@ -44,34 +9,27 @@ if has("win32")
 	set grepprg=findstr\ /N
 	set shell=$COMSPEC\ /F:ON
 	set shellcmdflag=/c
-	set backupdir =~\vimfiles\backupdir
-	set undodir   =~\vimfiles\undodir
-	set directory =~\vimfiles\swapdir
+	set backupdir =~/.cache/backupdir
+	set undodir   =~/.cache/undodir
+	set directory =~/.cache/swapdir
     let g:w3m#command ='c:/cygwin/bin/w3m.exe'
 	set packpath+=L:\cygwin64\home\user\.vim
 	nnoremap <Leader>t :<C-u>terminal ++close ++curwin bash
 elseif has("win32unix")
-	packadd vimdoc-ja
-	packadd vimproc.vim
-	"packadd vim-devicons
-	packadd vim-fugitive
-	packadd ack.vim
-	set backupdir =~/.vim/backupdir
-	set undodir   =~/.vim/undodir
-	set directory =~/.vim/swapdir
+	set backupdir =~/.cache/backupdir
+	set undodir   =~/.cache/undodir
+	set directory =~/.cache/swapdir
     let g:w3m#command ='w3m'
 	set mouse=a
-	set ttymouse=xterm2
 	"set grepprg=ufindstr
 else
-	set backupdir =~/.vim/backupdir
-	set undodir   =~/.vim/undodir
-	set directory =~/.vim/swapdir
+	set backupdir =~/.cache/backupdir
+	set undodir   =~/.cache/undodir
+	set directory =~/.cache/swapdir
     let g:w3m#command ='w3m'
 	set mouse=a
-	set ttymouse=xterm2
     if executable('ag')
-        set grepprg=ag\ --nogroup\ -iS
+        set grepprg=ag\ --nogroup
         set grepformat=%f:%l:%m
     elseif executable('ack')
         set grepprg=ack\ --nogroup
@@ -81,7 +39,6 @@ else
         set grepformat=%f:%l:%m,%f:%l%m,%f\ \ %l%m
     endif
 	vnoremap <C-C> "+y
-	"imap     <C-V> "+gP
 	imap     <C-V> <ESC>"+gpa
 	vmap     <C-V> "+gp
     cmap     <C-V> <C-R>+
@@ -92,6 +49,8 @@ endif
 " for terminal
 if has('termguicolors')
 	set termguicolors
+    let &t_8f = "\<Esc>[38;2;%lu;%lu;%lum"
+    let &t_8b = "\<Esc>[48;2;%lu;%lu;%lum"
 else
 endif
 set t_Co=256
@@ -99,7 +58,6 @@ set t_Co=256
 " common
 set cscopequickfix=s-,c-,d-,i-,t-,e-
 set cursorline
-set cryptmethod=blowfish2
 set nowrap
 set ts=4
 set sw=4
@@ -110,7 +68,6 @@ set incsearch
 set ic
 set cscopetag
 set listchars=tab:>-
-"set makeprg=rake
 set wildignorecase
 set fileignorecase
 set matchpairs+=<:>
@@ -120,7 +77,7 @@ set hidden
 set cursorline
 let c_space_errors=1
 let mapleader = ","
-set fillchars+=stl::
+"set fillchars+=stl::
 set wildmode=longest:full,full
 set ambiwidth=double
 set visualbell
@@ -132,6 +89,12 @@ let g:explVertical=1	" Split vertically
 let g:explSplitRight=1	" Put new window to the right of the explorer
 let g:explStartRight=0	" Put new explorer window to the left of the current window
 
+if !has('nvim')
+	so $VIMRUNTIME/vimrc_example.vim
+	set ttymouse=xterm2
+	set cryptmethod=blowfish2
+endif
+
 map <C-PageUp>	  [cz.
 map <C-PageDown>  ]cz.
 nnoremap <C-Tab>   gt
@@ -139,11 +102,12 @@ nnoremap <S-C-Tab> gT
 inoremap <silent> jj <ESC>
 
 nnoremap <Leader>s :<C-u>cs f s <C-R><C-W><CR>
-"nnoremap <Leader>a :<C-u>cs add .<CR>
 nnoremap <Leader>h :<C-u>QuickhlManualAdd! \<<C-R><C-W>\>
 nnoremap <silent> <Leader>H :<C-u>QuickhlManualReset<CR>
 nnoremap <C-n> :<C-u>cn<CR>
 nnoremap <C-p> :<C-u>cp<CR>
+nnoremap <Leader>a :<C-u>e ~/aaa.md<CR>
+nnoremap K :e ~/Proj/Topics/<C-R><C-W>.md<CR>
 
 " matchit スクリプトを読み込む
 so $VIMRUNTIME/macros/matchit.vim
@@ -178,8 +142,6 @@ endif
 "  redraw!
 "endfunction
 set diffopt=internal,filler,algorithm:histogram,indent-heuristic
-"set diffopt=internal,filler,algorithm:patience,indent-heuristic
-"set diffopt=internal,filler,algorithm:minimal,indent-heuristic
 
 " ruby
 " http://stackoverflow.com/questions/16902317/vim-slow-with-ruby-syntax-highlighting
@@ -224,10 +186,72 @@ function! CopyLocation() range
     call add(l:lines, '')
 	call setreg("@", l:lines)
 endf
+map <leader>b :call CopyLocation()<CR>
 
-map <F9> gF
-map <F10> :call CopyLocation()<CR>
-map <F11> :call FormatAspx()<CR>
+" Topics
+    let g:topicsPath = finddir('Topics', ';')
+    let g:topicRoot = g:topicsPath
+    if g:topicsPath == ''
+        function! Topic()
+            echo "Error: Topics folder is not found!"
+        endf
+        function! OpenMd()
+            echo "Error: Topics folder is not found!"
+        endf
+    else
+        let g:topicRoot = g:topicRoot[:-len("/Topics")]
+        let &path = &path . "," . g:topicRoot[:-1]
+
+        function! Topic()
+            let l:md = trim(system("kp mdnew"))
+            let l:title = input("title: ", l:md)
+            if l:title != ""
+                let l:date = strftime("%y%m%d")
+                call mkdir(g:topicsPath . "/" . l:date . "_" . l:title, "p")
+                execute "edit " . g:topicsPath . "/" . l:date . "_" . l:title . "/" . l:title . ".md"
+                call append(0, ["# " . l:title, ""])
+            endif
+        endf
+        function! GetMdList(ArgLead, CmdLine, CursorPos)
+            let l:mds = trim(system("kp mds"))
+			let l:mds = split(l:mds, '\n')
+            return uniq(l:mds + reverse(filter(map(range(1, bufnr('$')), 'bufname(v:val)'), 'v:val =~ "Topics.*\.md$"')))
+        endf
+
+        function! OpenMd()
+            let l:title = input("title: ", "", "customlist,GetMdList")
+            if l:title != ""
+                execute "edit " . l:title
+            endif
+        endf
+        noremap K :exe 'e ' . g:topicsPath . '/' . expand("<cword>") . ".md" <CR>
+    endif
+    map <leader>p :call Topic()<CR>
+    map <leader>m :call OpenMd()<CR>
+
+" vim-plug
+    call plug#begin()
+        Plug 'ctrlpvim/ctrlp.vim'
+        Plug 'easymotion/vim-easymotion'
+        Plug 'frazrepo/vim-rainbow'
+        Plug 'google/vim-codefmt'
+        Plug 'google/vim-maktaba'
+        Plug 'itchyny/lightline.vim'
+        Plug 'junegunn/vim-easy-align'
+        Plug 'lambdalisue/fern-git-status.vim'
+        Plug 'lambdalisue/fern-hijack.vim'
+        Plug 'lambdalisue/fern.vim'
+        Plug 'morhetz/gruvbox'
+        Plug 'prabirshrestha/vim-lsp'
+        Plug 'rafi/awesome-vim-colorschemes'
+        Plug 'ryanoasis/vim-devicons'
+        Plug 't9md/vim-quickhl'
+        Plug 'tpope/vim-fugitive'
+        Plug 'zah/nim.vim'
+		if !has('nvim')
+			Plug 'vim-jp/vimdoc-ja'
+		endif
+    call plug#end()
 
 " TagList
 nnoremap <silent> <F8> :TlistToggle<CR>
@@ -268,89 +292,8 @@ nnoremap <silent> <F8> :TlistToggle<CR>
 	"let g:CSApprox_hook_post = ['hi Normal  ctermbg=NONE', 'hi NonText ctermbg=NONE' ]
 	let g:CSApprox_attr_map = { 'italic' : 'underline', 'sp' : 'fg' }
 
-" VimFiler
-	let g:vimfiler_as_default_explorer = 1
-
-" unite
-	let g:unite_enable_start_insert = 1
-	let g:unite_enable_short_source_names = 1
-	nnoremap <silent> <Leader>b :<C-u>Unite buffer<CR>
-	nnoremap <silent> <Leader>c :<C-u>UniteWithBufferDir file<CR>
-	nnoremap <silent> <Leader>d :<C-u>Unite -buffer-name=dir -default-action=lcd directory_mru<CR>
-	nnoremap <silent> <Leader>f :<C-u>UniteWithCurrentDir file<CR>
-	nnoremap <silent> <Leader>k :<C-u>Unite -buffer-name=files bookmark<CR>
-	nnoremap <silent> <Leader>o :<C-u>Unite outline<CR>
-	nnoremap <silent> <Leader>r :<C-u>Unite neomru/file<CR>
-	nnoremap <silent> <Leader>p :<C-u>Unite file_rec/git<CR>
-	"nnoremap <silent> <Leader>v <Plug>AddComment 
-	nnoremap <silent> <Leader>V :<C-u>CheckReview
-	autocmd FileType unite call s:unite_my_settings()
-	function! s:unite_my_settings()
-    call unite#custom_default_action('source/bookmark/directory' , 'vimfiler')
-	endfunction
-
-" mru
-	let g:neomru#follow_links=1
-
-" codereview
-	let g:CodeReviewer_reviewer="TK"
-	let g:CodeReviewer_reviewFile=$HOME . "/.cache/review.rev"
-
-" SilverSearcher ag
-	" カーソル位置の単語をgrep検索
-	nnoremap <silent> <Leader>gg :<C-u>Unite grep:. -buffer-name=search-buffer<CR><C-R><C-W>
-	" grep検索結果の再呼出
-	nnoremap <silent> <Leader>g  :<C-u>UniteResume search-buffer<CR>
-
-	" unite grep に ag(The Silver Searcher) を使う
-	" pt に変更
-	" https://github.com/monochromegane/the_platinum_searcher
-	if executable('pt')
-	  let g:unite_source_grep_command = 'pt'
-	  let g:unite_source_grep_default_opts = '--nogroup --nocolor'
-	  let g:unite_source_grep_encoding = 'utf-8'
-	  let g:unite_source_grep_recursive_opt = ''
-	endif
-	"if executable('hwt')
-	"  let g:unite_source_grep_command = 'hwt'
-	"  let g:unite_source_grep_default_opts = '--nogroup --nocolor'
-	"  let g:unite_source_grep_encoding = 'utf-8'
-	"  let g:unite_source_grep_recursive_opt = ''
-	"endif
-
 " EasyAlign
 vmap <Enter> <Plug>(EasyAlign)
-
-" Tagbar
-	let g:tagbar_left = 1
-	let g:tagbar_autoclose = 1
-	nnoremap <silent> <F7> :TagbarToggle<CR>
-	let g:tagbar_type_javascript = {
-		\ 'ctagstype' : 'js',
-		\ 'ctagsbin' : 'ctags',
-		\ 'kinds'     : [
-			\ 'a:array',
-			\ 'b:boolean',
-			\ 'f:function',
-			\ 'n:number',
-			\ 'o:object',
-			\ 's:string',
-			\ 'v:variable',
-			\ 'r:regex',
-		\ ],
-		\ 'scope2kind' : {
-			\ 'array'    : 'a',
-			\ 'boolean'  : 'b',
-			\ 'function' : 'f',
-			\ 'object'   : 'o',
-			\ 'string'   : 's',
-			\ 'variable' : 'v',
-			\ 'regex'    : 'r',
-		\ },
-	\ }
-
-" vim-jsx
-let g:jsx_ext_required = 0 " Allow JSX in normal JS files
 
 " quick highlight
   let g:quickhl_manual_colors = [
@@ -418,8 +361,8 @@ let g:jsx_ext_required = 0 " Allow JSX in normal JS files
         \ ]
 
 " rainbow
-let g:rainbow_active = 1
-let g:rainbow_conf = {'guifgs': [ '#1abc9c', '#e67e22', '#2ecc71', '#f1c40f', '#3498db', '#e74c3c', '#9b59b6']}
+    let g:rainbow_active = 1
+    let g:rainbow_conf = {'guifgs': [ '#1abc9c', '#e67e22', '#2ecc71', '#f1c40f', '#3498db', '#e74c3c', '#9b59b6']}
 
 " lightline
   set laststatus=2
@@ -443,11 +386,11 @@ let g:rainbow_conf = {'guifgs': [ '#1abc9c', '#e67e22', '#2ecc71', '#f1c40f', '#
     \ }
 
   function! MyFiletype()
-    return winwidth(0) > 70 ? (strlen(&filetype) ? &filetype . ' ' . WebDevIconsGetFileTypeSymbol() : 'no ft') : ''
+    return winwidth(0) > 70 ? (strlen(&filetype) ? &filetype . ' ' . WebDevIconsGetFileTypeSymbol(): 'no ft') : ''
   endfunction
   
   function! MyFileformat()
-    return winwidth(0) > 70 ? (&fileformat . ' ' . WebDevIconsGetFileFormatSymbol()) : ''
+    return winwidth(0) > 70 ? (&fileformat . ' ' . WebDevIconsGetFileFormatSymbol()): ''
   endfunction
 
   function! LightlineModified()
@@ -462,16 +405,13 @@ let g:rainbow_conf = {'guifgs': [ '#1abc9c', '#e67e22', '#2ecc71', '#f1c40f', '#
 	let fname = expand('%:t')
 	return fname == '__Tagbar__' ? g:lightline.fname :
 		  \ fname =~ '__Gundo\|NERD_tree' ? '' :
-		  \ &ft == 'vimfiler' ? vimfiler#get_status_string() :
-		  \ &ft == 'unite' ? unite#get_status_string() :
-		  \ &ft == 'vimshell' ? vimshell#get_status_string() :
 		  \ ('' != LightlineReadonly() ? LightlineReadonly() . ' ' : '') .
 		  \ ('' != fname ? fname : '[No Name]') .
 		  \ ('' != LightlineModified() ? ' ' . LightlineModified() : '')
   endfunction
 
   function! LightlineFileencoding()
-	return winwidth(0) > 70 ? ((&fenc !=# '' ? &fenc : &enc) . WebDevIconsGetFileFormatSymbol()) : ''
+	return winwidth(0) > 70 ? ((&fenc !=# '' ? &fenc : &enc) . WebDevIconsGetFileFormatSymbol()) . ' ' : ''
   endfunction
 
   function! LightlineMode()
@@ -480,9 +420,6 @@ let g:rainbow_conf = {'guifgs': [ '#1abc9c', '#e67e22', '#2ecc71', '#f1c40f', '#
 		  \ fname == '__Gundo__' ? 'Gundo' :
 		  \ fname == '__Gundo_Preview__' ? 'Gundo Preview' :
 		  \ fname =~ 'NERD_tree' ? 'NERDTree' :
-		  \ &ft == 'unite' ? 'Unite' :
-		  \ &ft == 'vimfiler' ? 'VimFiler' :
-		  \ &ft == 'vimshell' ? 'VimShell' :
 		  \ winwidth(0) > 60 ? lightline#mode() : ''
   endfunction
 
@@ -501,63 +438,89 @@ let g:rainbow_conf = {'guifgs': [ '#1abc9c', '#e67e22', '#2ecc71', '#f1c40f', '#
 	return lightline#statusline(0)
   endfunction
 
-  let g:unite_force_overwrite_statusline = 0
-  let g:vimfiler_force_overwrite_statusline = 0
-  let g:vimshell_force_overwrite_statusline = 0
-
-"" gitgutter
-"	if has("win32unix")
-"		let g:gitgutter_sign_added              = '+'
-"		let g:gitgutter_sign_modified           = 'o'
-"		let g:gitgutter_sign_removed            = 'x'
-"		let g:gitgutter_sign_removed_first_line = '^'
-"		let g:gitgutter_sign_modified_removed   = 'ox'
-"		let g:gitgutter_override_sign_column_highlight = 0
-"		highlight SignColumn            guibg=BLACK
-"		highlight GitGutterAdd          guibg=BLACK guifg=orange
-"		highlight GitGutterChange       guibg=BLACK guifg=orange
-"		highlight GitGutterDelete       guibg=BLACK guifg=purple
-"		highlight GitGutterChangeDelete guibg=BLACK guifg=orange
-"	  packadd vim-gitgutter
-"	endif
-
-" ack.vim
-	let g:ack_autofold_results = 0
-	let g:ack_default_options = '--nogroup --nocolor'
-	let g:ackprg = "pt"
-	nnoremap <leader>a :Ack!<Space>
-
-" gundo
-	nnoremap <leader>u :GundoToggle<CR>
-
 " editorconfig
 	let g:editorconfig_blacklist = {
 	    \ 'filetype': ['git.*', 'fugitive'],
 	    \ 'pattern': ['\.un~$']}
 
-" neomru
-	if has("unix")
-		" パスにmntが入っていると無視されるのでmntを抜く
-		let g:neomru#file_mru_ignore_pattern='\~$\|\.\%(o\|exe\|dll\|bak\|zwc\|pyc\|sw[po]\)$\|\%(^\|/\)\.\%(hg\|git\|bzr\|svn\)\%($\|/\)\|^\%(\\\\\|/media/\|/temp/\|/tmp/\|\%(/private\)\=/var/folders/\)\|\%(^\%(fugitive\)://\)\|\%(^\%(term\)://\)'
-	endif
-
 " devicons
-    let g:webdevicons_enable_unite = 1
-    let g:webdevicons_enable_vimfiler = 1
     let g:WebDevIconsUnicodeGlyphDoubleWidth = 1
 
 " markdown
-    " https://github.com/tpope/vim-markdown
+  " https://github.com/tpope/vim-markdown
     let g:markdown_fenced_languages = ['c', 'cpp', 'make', 'cmake', 'html', 'python', 'bash=sh']
     let g:markdown_minlines = 500
     let g:markdown_folding = 1
 
-set tgc
-set background=dark
-colo gruvbox
-highlight CursorLine cterm=none
-"set background=light
-"colo eclipse
+" lsp
+	let g:lsp_diagnostics_enabled = 0
+	if (executable('clangd'))
+	    au User lsp_setup call lsp#register_server({
+            \ 'name': 'clangd',
+            \ 'cmd': {server_info->['clangd']},
+            \ 'allowlist': ['c', 'cpp', 'inc', 'objc', 'objcpp'],
+            \ })
+    endif
+
+    function! s:on_lsp_buffer_enabled() abort
+        setlocal omnifunc=lsp#complete
+        setlocal signcolumn=yes
+        if exists('+tagfunc') | setlocal tagfunc=lsp#tagfunc | endif
+        nmap <buffer> gd <plug>(lsp-definition)
+        nmap <buffer> gs <plug>(lsp-document-symbol-search)
+        nmap <buffer> gS <plug>(lsp-workspace-symbol-search)
+        nmap <buffer> gr <plug>(lsp-references)
+        nmap <buffer> gi <plug>(lsp-implementation)
+        nmap <buffer> gp <plug>(lsp-type-definition)
+        nmap <buffer> <leader>rn <plug>(lsp-rename)
+        nmap <buffer> [g <plug>(lsp-previous-diagnostic)
+        nmap <buffer> ]g <plug>(lsp-next-diagnostic)
+        nmap <buffer> H <plug>(lsp-hover)
+        inoremap <buffer> <expr><c-f> lsp#scroll(+4)
+        inoremap <buffer> <expr><c-b> lsp#scroll(-4)
+
+        let g:lsp_format_sync_timeout = 1000
+        autocmd! BufWritePre *.rs,*.go call execute('LspDocumentFormatSync')
+        
+        " refer to doc to add more commands
+    endfunction
+
+    augroup lsp_install
+        au!
+        autocmd User lsp_buffer_enabled call s:on_lsp_buffer_enabled()
+    augroup END
+
+" ctrl-p
+    let g:ctrlp_map = '<c-e>'
+
+" easymotion
+    nmap <Leader>e <Plug>(easymotion-overwin-f)
+
+" fern
+    nmap <Leader>. <Plug>(fern-action-hidden)
+
+" codefmt
+    augroup autoformat_settings
+      autocmd FileType bzl AutoFormatBuffer buildifier
+      autocmd FileType c,cpp,proto,javascript,arduino AutoFormatBuffer clang-format
+      autocmd FileType dart AutoFormatBuffer dartfmt
+      autocmd FileType go AutoFormatBuffer gofmt
+      autocmd FileType gn AutoFormatBuffer gn
+      autocmd FileType html,css,sass,scss,less,json AutoFormatBuffer js-beautify
+      autocmd FileType java AutoFormatBuffer google-java-format
+      autocmd FileType python AutoFormatBuffer yapf
+      autocmd FileType rust AutoFormatBuffer rustfmt
+      autocmd FileType vue AutoFormatBuffer prettier
+    augroup END
+
+" quickrun
+    nmap <Leader>q <Plug>(quickrun)
+
+" gruvbox
+    " https://github.com/lifepillar/vim-gruvbox8/blob/master/colors/gruvbox8.vim
+    let g:terminal_ansi_colors = ['#282828', '#cc241d', '#98971a', '#d79921', '#458588', '#b16286', '#689d6a', '#a89984', '#928374', '#fb4934', '#b8bb26', '#fabd2f', '#83a598', '#d3869b', '#8ec07c', '#ebdbb2']
+    set background=dark
+    colo gruvbox
 
 " When using `dd` in the quickfix list, remove the item from the quickfix list.
 function! RemoveQFItem()
@@ -574,9 +537,14 @@ autocmd FileType qf map <buffer> dd :RemoveQFItem<cr>
 
 au VimEnter * if filereadable("init.vim") | source init.vim | endif
 
+au FileType c          setlocal sw=2 ts=2 et
+au FileType cpp        setlocal sw=2 ts=2 et
 au FileType cs         setlocal sw=4 ts=4 et
+au FileType cuda       setlocal sw=2 ts=2 et
 au FileType html       setlocal sw=2 ts=2 et
 au FileType javascript setlocal sw=2 ts=2 et
 au FileType json       setlocal sw=2 ts=2 et
+au FileType markdown   setlocal sw=2 ts=2 et
 au FileType ruby       setlocal sw=2 ts=2 et
+au FileType sh         setlocal sw=2 ts=2 et
 au FileType typescript setlocal sw=2 ts=2 et
