@@ -23,9 +23,9 @@ elseif has("win32unix")
 	set mouse=a
 	"set grepprg=ufindstr
 else
-	set backupdir =~/.cache/backupdir
-	set undodir   =~/.cache/undodir
-	set directory =~/.cache/swapdir
+	set backupdir =~/.cache/vim/backupdir
+	set undodir   =~/.cache/vim/undodir
+	set directory =~/.cache/vim/swapdir
     let g:w3m#command ='w3m'
 	set mouse=a
     if executable('ag')
